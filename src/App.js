@@ -18,6 +18,8 @@ class App extends Component {
     loadedFile: '',
     filesData: [],
     activeIndex: 0,
+    newEntry: false,
+    newEntryName: '',
     directory: settings.get('directory') || null,
   };
 
@@ -103,14 +105,59 @@ class App extends Component {
     });
   };
 
+  newFile = e => {
+    e.preventDefault();
+    const { newEntryName, directory, filesData } = this.state;
+    const fileDate = dateFns.format(new Date(), 'MM-DD-YYYY');
+    const filePath = `${directory}/${newEntryName}_${fileDate}.md`;
+    fs.writeFile(filePath, '', err => {
+      if (err) return console.error(err);
+
+      filesData.unshift({
+        path: filePath,
+        date: fileDate,
+        title: newEntryName,
+      });
+
+      this.setState({
+        newEntry: false,
+        newEntryName: '',
+        loadedFile: '',
+        filesData,
+      });
+    });
+  };
+
   render() {
-    const { loadedFile, directory, filesData, activeIndex } = this.state;
+    const {
+      loadedFile,
+      directory,
+      filesData,
+      activeIndex,
+      newEntry,
+      newEntryName,
+    } = this.state;
     return (
       <AppWrap>
         <Header>Journal</Header>
         {directory ? (
           <Split>
             <FilesWindow>
+              <Button onClick={() => this.setState({ newEntry: !newEntry })}>
+                + New Entry
+              </Button>
+              {newEntry && (
+                <form action="" onSubmit={this.newFile}>
+                  <EntryInput
+                    value={newEntryName}
+                    onChange={e =>
+                      this.setState({ newEntryName: e.target.value })
+                    }
+                    autoFocus
+                    type="text"
+                  />
+                </form>
+              )}
               {filesData.map((file, index) => (
                 <FileButton
                   active={activeIndex === index}
@@ -212,6 +259,7 @@ const RenderedWindow = styled.div`
   padding: 20px;
   color: #fff;
   border-left: 1px solid #302b3a;
+  overflow: auto;
   h1,
   h2,
   h3,
@@ -239,14 +287,11 @@ const FileButton = styled.button`
   text-align: left;
   border-bottom: 1px solid #302b3a;
   transition: 0.3s ease all;
+  outline: none;
   &:hover {
     opacity: 1;
     border-left: 4px solid #82d8d8;
   }
-  ${({ active }) =>
-    active &&
-    `opacity: 1;
-    border-left: 4px solid #82d8d8;`}
   .title {
     font-weight: bold;
     font-size: 0.9rem;
@@ -255,6 +300,32 @@ const FileButton = styled.button`
   .date {
     margin: 0;
   }
+  ${({ active }) =>
+    active &&
+    `opacity: 1;
+    border-left: 4px solid #82d8d8;`}
+`;
+
+const Button = styled.button`
+  background: transparent;
+  color: white;
+  display: block;
+  border: 1px solid #82d8d8;
+  margin: 1rem auto;
+  font-size: 1rem;
+  transition: 0.3s ease all;
+  padding: 5px 10px;
+  &:hover {
+    background: #82d8d8;
+    color: #191324;
+  }
+`;
+
+const EntryInput = styled.input`
+  width: 100%;
+  height: 30px;
+  background-color: #82d8d8;
+  font-size: 1rem;
 `;
 
 const formatDate = date => dateFns.format(new Date(date), 'MMMM Do YYYY');
