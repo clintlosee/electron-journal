@@ -55,6 +55,13 @@ function createWindow() {
             openDir();
           },
         },
+        {
+          label: 'Save File',
+          accelerator: 'CmdOrCtrl+S',
+          click() {
+            mainWindow.webContents.send('save-file');
+          },
+        },
         { type: 'separator' },
         {
           ...(isMac ? { role: 'close' } : { role: 'quit' }),

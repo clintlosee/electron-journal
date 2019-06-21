@@ -29,10 +29,8 @@ class App extends Component {
       this.loadAndReadFiles(directory);
     }
 
-    ipcRenderer.on('new-file', (event, fileContent) => {
-      this.setState({
-        loadedFile: fileContent,
-      });
+    ipcRenderer.on('save-file', event => {
+      this.saveFile();
     });
     ipcRenderer.on('new-dir', (event, dir) => {
       this.setState({
@@ -88,7 +86,7 @@ class App extends Component {
   };
 
   render() {
-    const { loadedFile, directory, filesData } = this.state;
+    const { loadedFile, directory, filesData, activeIndex } = this.state;
     return (
       <AppWrap>
         <Header>Journal</Header>
@@ -96,7 +94,12 @@ class App extends Component {
           <Split>
             <FilesWindow>
               {filesData.map((file, index) => (
-                <button onClick={this.changeFile(index)}>{file.path}</button>
+                <FileButton
+                  active={activeIndex === index}
+                  onClick={this.changeFile(index)}
+                >
+                  {file.path}
+                </FileButton>
               ))}
             </FilesWindow>
             <CodeWindow>
@@ -205,4 +208,23 @@ const RenderedWindow = styled.div`
   a {
     color: #e54b4b;
   }
+`;
+
+const FileButton = styled.button`
+  padding: 10px;
+  width: 100%;
+  background: #191324;
+  opacity: 0.4;
+  color: white;
+  border: none;
+  border-bottom: 1px solid #302b3a;
+  transition: 0.3s ease all;
+  &:hover {
+    opacity: 1;
+    border-left: 4px solid #82d8d8;
+  }
+  ${({ active }) =>
+    active &&
+    `opacity: 1;
+    border-left: 4px solid #82d8d8;`}
 `;
