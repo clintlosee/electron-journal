@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Markdown from 'markdown-to-jsx';
 import AceEditor from 'react-ace';
 import styled from 'styled-components';
+import dateFns from 'date-fns';
 import brace from 'brace';
 import 'brace/mode/markdown';
 import 'brace/theme/dracula';
@@ -56,6 +57,15 @@ class App extends Component {
         };
       });
 
+      //* sort files
+      filesData.sort((a, b) => {
+        const aDate = new Date(a.date);
+        const bDate = new Date(b.date);
+        const aSec = aDate.getTime();
+        const bSec = bDate.getTime();
+        return bSec - aSec;
+      });
+
       this.setState(
         {
           filesData,
@@ -107,7 +117,7 @@ class App extends Component {
                   onClick={this.changeFile(index)}
                 >
                   <p className="title">{file.title}</p>
-                  <p className="date">{file.date}</p>
+                  <p className="date">{formatDate(file.date)}</p>
                 </FileButton>
               ))}
             </FilesWindow>
@@ -246,3 +256,5 @@ const FileButton = styled.button`
     margin: 0;
   }
 `;
+
+const formatDate = date => dateFns.format(new Date(date), 'MMMM Do YYYY');
