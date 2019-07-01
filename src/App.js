@@ -39,41 +39,45 @@ class App extends Component {
       this.setState({
         directory: dir,
       });
-      settings.set('directory', directory);
-      this.loadAndReadFiles(directory);
+      settings.set('directory', dir);
+      this.loadAndReadFiles(dir);
     });
   }
 
   loadAndReadFiles = directory => {
     fs.readdir(directory, (err, files) => {
-      const filteredFiles = files.filter(file => file.includes('.md'));
-      const filesData = filteredFiles.map(file => {
-        const date = file.substr(
-          file.indexOf('_') + 1,
-          file.indexOf('.') - file.indexOf('_') - 1
+      if (files) {
+        const filteredFiles = files.filter(file => file.includes('.md'));
+        const filesData = filteredFiles.map(file => {
+          const date = file.substr(
+            file.indexOf('_') + 1,
+            file.indexOf('.') - file.indexOf('_') - 1
+          );
+          return {
+            date,
+            path: `${directory}/${file}`,
+            title: file.substr(0, file.indexOf('_')),
+          };
+        });
+
+        //* sort files
+        filesData.sort((a, b) => {
+          const aDate = new Date(a.date);
+          const bDate = new Date(b.date);
+          const aSec = aDate.getTime();
+          const bSec = bDate.getTime();
+          return bSec - aSec;
+        });
+
+        this.setState(
+          {
+            filesData,
+          },
+          () => this.loadFile(0)
         );
-        return {
-          date,
-          path: `${directory}/${file}`,
-          title: file.substr(0, file.indexOf('_')),
-        };
-      });
-
-      //* sort files
-      filesData.sort((a, b) => {
-        const aDate = new Date(a.date);
-        const bDate = new Date(b.date);
-        const aSec = aDate.getTime();
-        const bSec = bDate.getTime();
-        return bSec - aSec;
-      });
-
-      this.setState(
-        {
-          filesData,
-        },
-        () => this.loadFile(0)
-      );
+      } else {
+        this.setState({ filesData: [] });
+      }
     });
   };
 
