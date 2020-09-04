@@ -19,7 +19,7 @@
     "electron-is-dev": "^1.1.0",
     "electron-react-devtools": "^0.5.3",
     "electron-settings": "^3.2.0",
-    "markdown-to-jsx": "^6.10.2",
+    "markdown-to-jsx": "^6.11.4",
     "react": "^16.8.6",
     "react-ace": "^7.0.2",
     "react-dom": "^16.8.6",
